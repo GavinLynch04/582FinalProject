@@ -18,6 +18,8 @@ from kvpress import (
     SnapKVFairEvictionPress,
     StreamingLLMFairEvictionPress,
 )
+
+from kvpress.presses import (Five82Press)
 import os
 from transformers.models.auto.tokenization_auto import AutoTokenizer
 
@@ -30,7 +32,7 @@ def get_attention_implementation_from_strategy(strategy: str) -> str:
         "observed_attention",
         "observed_attention_fair_eviction",
         "snap_fair_eviction",
-        "tova_fair_eviction",
+        "tova_fair_eviction"
     ]
     if strategy in eager_attention_strategies:
         return "eager"
@@ -47,7 +49,7 @@ def get_output_attentions_from_strategy(strategy: str) -> bool:
         "observed_attention",
         "observed_attention_fair_eviction",
         "snap_fair_eviction",
-        "tova_fair_eviction",
+        "tova_fair_eviction"
     ]
     if strategy in output_attentions_strategies:
         return True
@@ -128,7 +130,6 @@ def analyze_and_save_results(
 
     return overall_stats  # Return for potential use (e.g., plotting)
 
-
 def press_resolver(strategy: str) -> ScorerPress:
     """
     Resolves the press strategy to the appropriate class instance.
@@ -157,9 +158,10 @@ def press_resolver(strategy: str) -> ScorerPress:
         return SnapKVFairEvictionPress(window_size=16)
     elif strategy == "streamingllm_fair_eviction":
         return StreamingLLMFairEvictionPress()
+    elif strategy == "five82":
+        return Five82Press(window_size=16)
     else:
         raise NotImplementedError(f"Press strategy not implemented: {strategy}")
-
 
 def set_seeds(seed):
     torch.manual_seed(seed)

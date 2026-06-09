@@ -1304,7 +1304,7 @@ def main(config: CompressedContextIFEval):
     logger.info("Loading model and tokenizer...")
     model = AutoModelForCausalLM.from_pretrained(
         config.model_name_or_path,
-        torch_dtype=torch.bfloat16 if torch.cuda.is_available() else torch.float32,
+        torch_dtype=torch.bfloat16,
         attn_implementation=get_attention_implementation_from_strategy(
             config.press_name
         ),
