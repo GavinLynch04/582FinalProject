@@ -6,7 +6,6 @@ import numpy as np
 import torch
 from kvpress import (
     PyramidKVPress,
-    ScorerPress,
     SnapKVPress,
     StreamingLLMPress,
     ObservedAttentionPress,
@@ -18,6 +17,7 @@ from kvpress import (
     SnapKVFairEvictionPress,
     StreamingLLMFairEvictionPress,
 )
+from kvpress.presses.base_press import BasePress
 
 from kvpress.presses import (Five82Press)
 import os
@@ -130,7 +130,7 @@ def analyze_and_save_results(
 
     return overall_stats  # Return for potential use (e.g., plotting)
 
-def press_resolver(strategy: str) -> ScorerPress:
+def press_resolver(strategy: str) -> BasePress:
     """
     Resolves the press strategy to the appropriate class instance.
     By default, compression = 0.0. It should be modified after instantiation
@@ -159,7 +159,7 @@ def press_resolver(strategy: str) -> ScorerPress:
     elif strategy == "streamingllm_fair_eviction":
         return StreamingLLMFairEvictionPress()
     elif strategy == "five82":
-        return Five82Press(window_size=16)
+        return Five82Press(on_the_fly_scoring=True)
     else:
         raise NotImplementedError(f"Press strategy not implemented: {strategy}")
 
