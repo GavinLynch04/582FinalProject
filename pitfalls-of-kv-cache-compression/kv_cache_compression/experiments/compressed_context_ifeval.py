@@ -1279,7 +1279,8 @@ def main(config: CompressedContextIFEval):
     run_name_defense_template_part = (
         f"_defense_{config.defense_template_key}" if config.defense_template_key else ""
     )
-    run_name_default = f"{config.model_name_shorthand}_{config.press_name}{run_name_defense_template_part}_num_prompts_{config.num_prompts}_ratio_start_{config.compression_ratio_start}_ratio_end_{config.compression_ratio_end}_ratio_steps_{config.compression_ratio_steps}_max_new_tokens_{config.max_new_tokens}_sample_responses_{config.sample_responses}_{time.strftime('%Y%m%d-%H%M%S')}"
+    timestamp = time.strftime('%Y%m%d-%H-%M-%S')
+    run_name_default = f"{config.model_name_shorthand}_{config.press_name}{run_name_defense_template_part}_{timestamp}"
     run_dir = config.run_name if config.run_name else run_name_default
     run_path = config.outputs_base / run_dir
     run_path.mkdir(parents=True, exist_ok=True)
@@ -1289,6 +1290,13 @@ def main(config: CompressedContextIFEval):
     responses_path.mkdir(parents=True, exist_ok=True)
     plot_path = run_path / "plots"
     plot_path.mkdir(parents=True, exist_ok=True)
+
+    # Write a markdown summary of the full run config
+    with open(run_path / "run_config.md", "w") as f:
+        f.write(f"# Run config — {timestamp}\n\n")
+        f.write(f"| Parameter | Value |\n|---|---|\n")
+        for k, v in vars(config).items():
+            f.write(f"| `{k}` | `{v}` |\n")
 
     # Set up logging
     logging.basicConfig(
