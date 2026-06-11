@@ -172,7 +172,7 @@ def test_instruction_following_loose(
 def read_prompt_to_response_dict(input_jsonl_filename):
     """Creates dictionary matching prompt and response."""
     return_dict = {}
-    with open(input_jsonl_filename, "r") as f:
+    with open(input_jsonl_filename, "r", encoding="utf-8") as f:
         for line in f:
             example = json.loads(line)
             return_dict[example["key"]] = example["messages"][-1]["content"]
@@ -191,6 +191,11 @@ def compute_scores(results: Dict[str, List]) -> Dict[str, float]:
     for version in ["strict", "loose"]:
         prompt_correct = sum(results[f"prompt_{version}"])
         prompt_total = len(results[f"prompt_{version}"])
+        if prompt_total == 0:
+            raise ValueError(
+                "No evaluated prompts — responses file is empty or no response keys matched "
+                "the input keys. Check that the press did not error on every prompt."
+            )
         prompt_acc = prompt_correct / prompt_total
         scores[f"prompt_{version}"] = prompt_acc
 
