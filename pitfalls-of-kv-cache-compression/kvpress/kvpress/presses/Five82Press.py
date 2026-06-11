@@ -46,6 +46,17 @@ class Five82Press(DuoAttentionPress):
         default=None, init=False, repr=False
     )
 
+    # Override the parent's read-only compression_ratio property so the
+    # experiment sweep loop can drive compression by adjusting the pyramid.
+    # value=0.0 → max=1.0, min=1.0 → all heads retrieval (true uncompressed baseline)
+    # value=1.0 → max=0.0, min=0.0 → all heads streaming (maximum compression)
+    # min decreases faster than max so the pyramid spread grows with compression.
+    # The spread at value=1.0 matches the original default spread (0.75 - 0.05 = 0.70).
+    @DuoAttentionPress.compression_ratio.setter
+    def compression_ratio(self, value: float):
+        self.max_retrieval_ratio = max(0.0, 1.0 - value)
+        self.min_retrieval_ratio = max(0.0, self.max_retrieval_ratio - value * 0.70)
+
     def _make_pyramid_streaming_mask(self, model):
         """
         Mask each attention head to be either a retrieval or streaming head, following pyramid pattern
