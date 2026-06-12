@@ -1,4 +1,4 @@
-# Run Five82Press experiment
+# Run DuoAttention experiment (on-the-fly scoring, for models without pre-computed patterns)
 param(
     [string]$ENV_NAME = "csc448-gpu"
 )
@@ -28,7 +28,7 @@ try {
         --model_name_or_path $MODEL `
         --model_name_shorthand "llama_3.2_1b_instruct" `
         --model_cache_dir "$env:USERPROFILE\.cache\huggingface\hub" `
-        --press_name five82 `
+        --press_name duo_attention_on_the_fly `
         --num_prompts 128 `
         --compression_ratio_start 0.0 `
         --compression_ratio_end 0.9 `
