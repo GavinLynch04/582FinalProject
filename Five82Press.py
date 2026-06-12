@@ -102,4 +102,6 @@ class Five82Press(DuoAttentionPress):
         # small enough that eviction actually occurs on short IFEval-style prompts.
         self.sink_size = self.short_context_sink_size
         self.recent_size = self.short_context_recent_size
+        self.compression_ratio = self.head_compression_ratio
+        super().__post_init_from_model__(model)
         self.streaming_mask = self._make_pyramid_streaming_mask(model).to(model.device)

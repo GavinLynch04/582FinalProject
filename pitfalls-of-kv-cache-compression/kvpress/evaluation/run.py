@@ -6,20 +6,15 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import pandas as pd
 
-# ==========================================
-# 1. Configuration
-# ==========================================
-# Add your custom press name to this list once it's in evaluate_registry.py
-PRESSES = ["Pharoah"]
+
+PRESSES = ["five"]
 COMPRESSION_RATIOS = [0.1, 0.3, 0.5, 0.7, 0.9]
 
 DATASET = "ruler"
 MODEL = "meta-llama/Meta-Llama-3.1-8B-Instruct"
 OUTPUT_DIR = "./results"
 
-# ==========================================
-# 2. Run Evaluations
-# ==========================================
+
 for press in PRESSES:
     for ratio in COMPRESSION_RATIOS:
         print(f"Running evaluation: {press} at ratio {ratio}")
@@ -42,12 +37,8 @@ for press in PRESSES:
 
 print("\nAll evaluations complete! Parsing results for plotting...")
 
-# ==========================================
-# 3. Parse Results & Extract Metrics
-# ==========================================
 data_points = []
 
-# Walk through the output directory to collect metrics
 results_path = Path(OUTPUT_DIR)
 for config_dir in results_path.iterdir():
     if not config_dir.is_dir():
@@ -66,11 +57,8 @@ for config_dir in results_path.iterdir():
             with open(metrics_file, "r") as f:
                 metrics_data = json.load(f)
 
-            # Dynamic extraction based on RULER or other benchmark structures
-            # Adjust the key if your scorer outputs a different primary metric name
             accuracy = metrics_data.get("accuracy", metrics_data.get("avg", None))
             if accuracy is None:
-                # Fallback to the first numeric value found if key is non-standard
                 numeric_values = [v for v in metrics_data.values() if isinstance(v, (int, float))]
                 accuracy = numeric_values[0] if numeric_values else 0.0
 
@@ -85,12 +73,8 @@ for config_dir in results_path.iterdir():
 # Convert parsed data into a DataFrame
 df_results = pd.DataFrame(data_points)
 
-# Filter down to the specific benchmark/run we just did
 df_results = df_results[df_results["press_name"].isin(PRESSES)]
 
-# ==========================================
-# 4. Generate the Compression vs. Accuracy Plot
-# ==========================================
 plt.figure(figsize=(10, 6))
 
 for press in PRESSES:
@@ -112,9 +96,8 @@ plt.ylabel("Accuracy / Metric Score", fontsize=12)
 plt.grid(True, linestyle="--", alpha=0.6)
 plt.legend(fontsize=11)
 plt.xlim(0.0, 1.0)
-plt.ylim(0.0, 1.0)  # Adjust if your metric doesn't scale 0-1
+plt.ylim(0.0, 1.0)
 
-# Save the final figure
 plot_output = "./compression_vs_accuracy.png"
 plt.savefig(plot_output, dpi=300, bbox_inches="tight")
 print(f"\nSuccess! Performance curve saved to: {plot_output}")
