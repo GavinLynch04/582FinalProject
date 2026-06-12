@@ -32,6 +32,7 @@ from kvpress import (
     ThinKPress,
     TOVAPress,
 )
+from kvpress.presses import Five82Press
 
 # These dictionaries define the available datasets, scorers, and KVPress methods for evaluation.
 DATASET_REGISTRY = {
@@ -72,6 +73,7 @@ PRESS_REGISTRY = {
     "expected_attention": ExpectedAttentionPress(),
     "finch": FinchPress(),
     "keydiff": KeyDiffPress(),
+    "five": Five82Press(),
     "kvzip": KVzipPress(),
     "knorm": KnormPress(),
     "observed_attention": ObservedAttentionPress(),
