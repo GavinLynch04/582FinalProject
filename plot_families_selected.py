@@ -1,6 +1,6 @@
 """
-Regenerate families_all_strict_vs_ratio.png for a single run,
-keeping only a chosen subset of instruction families.
+Regenerate families_all_strict_vs_ratio.svg for a single run,
+keeping all instruction families.
 
 Usage (from repo root):
     python plot_families_selected.py
@@ -20,10 +20,9 @@ DEFAULT_RUN = BASE / "llama_3.2_1b_instruct_five82_20260611-22-56-13"
 
 FAMILIES = [
     "detectable_format",
-    "length_constraints",
     "keywords",
+    "length_constraints",
     "punctuation",
-    "startend",
 ]
 
 
@@ -64,21 +63,44 @@ def load_results(run_dir: Path) -> tuple[np.ndarray, dict[str, np.ndarray]]:
 
 
 def plot(xs: np.ndarray, fam_strict: dict[str, np.ndarray], out_path: Path) -> None:
-    plt.figure()
+    fig, ax = plt.subplots(figsize=(7, 4.5))
+
+    color_map = {
+        "detectable_format": "#4a2377",  # Purple
+        "keywords": "#f55f74",  # Pink
+        "length_constraints": "#8cc5e3",  # Blue
+        "punctuation": "#0d7d87"  # Teal
+    }
+
     for fam in FAMILIES:
         ys = fam_strict[fam]
         if np.all(np.isnan(ys)):
             continue
-        plt.plot(xs, ys, marker="o", label=fam)
-    plt.xlabel("Compression ratio")
-    plt.ylabel("Strict")
-    plt.title("All Families (Strict) vs Compression Ratio")
-    plt.ylim(0.0, 1.0)
-    plt.grid(True, alpha=0.3)
-    plt.legend(title="Family", bbox_to_anchor=(1.02, 1), loc="upper left", borderaxespad=0.0)
+
+        color = color_map.get(fam, "black")
+
+        ax.plot(xs, ys, label=fam, color=color, linewidth=2)
+
+    ax.set_xlabel("Compression Ratio (fraction of KV cache evicted)", fontsize=11)
+    ax.set_ylabel("Strict Accuracy", fontsize=11)
+    #ax.set_title("All Families (Strict) vs Compression Ratio", fontsize=11)
+    ax.set_ylim(0.0, 1.0)
+    ax.set_xlim(-0.02, 0.92)
+
+    # Remove top, left, and right spines
+    for spine in ["top", "left", "right"]:
+        ax.spines[spine].set_visible(False)
+
+    # Light grey horizontal grid lines only
+    ax.grid(True, axis='y', color='lightgrey', linestyle='-', alpha=0.7)
+    ax.set_axisbelow(True)
+
+    # Legend moved inside the plot axes bounding box at the top right
+    ax.legend(title="Family", loc="upper right", fontsize=10)
+
     out_path.parent.mkdir(parents=True, exist_ok=True)
-    plt.savefig(out_path, bbox_inches="tight")
-    plt.close()
+    fig.savefig(out_path, bbox_inches="tight", dpi=600, format="pdf")
+    plt.close(fig)
     print(f"Saved: {out_path}")
 
 
@@ -90,7 +112,8 @@ def main():
     xs, fam_strict = load_results(args.run_dir)
     print(f"Loaded {len(xs)} ratios: {xs.tolist()}")
 
-    out_path = args.run_dir / "plots" / "families_all_strict_vs_ratio.png"
+    # Output tracking adapted to match .svg format modification
+    out_path = args.run_dir / "plots" / "families_all_strict_vs_ratio.pdf"
     plot(xs, fam_strict, out_path)
 
 
