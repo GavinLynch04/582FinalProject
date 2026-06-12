@@ -19,9 +19,24 @@ from kvpress import (
 )
 from kvpress.presses.base_press import BasePress
 
-from kvpress.presses import (Five82Press)
+from Five82Press import Five82Press
+from kvpress.presses.duo_attention_press import DuoAttentionPress
 import os
 from transformers.models.auto.tokenization_auto import AutoTokenizer
+
+
+class DuoAttentionPressWrapper(DuoAttentionPress):
+    """Thin wrapper that allows compression_ratio to be set (maps to head_compression_ratio)."""
+
+    @property
+    def compression_ratio(self):
+        if self.compression_ratio_ is not None:
+            return self.compression_ratio_
+        return self.head_compression_ratio
+
+    @compression_ratio.setter
+    def compression_ratio(self, value):
+        self.head_compression_ratio = value
 
 
 def get_attention_implementation_from_strategy(strategy: str) -> str:
@@ -160,6 +175,10 @@ def press_resolver(strategy: str) -> BasePress:
         return StreamingLLMFairEvictionPress()
     elif strategy == "five82":
         return Five82Press(on_the_fly_scoring=True)
+    elif strategy == "duo_attention_on_the_fly":
+        return DuoAttentionPressWrapper(on_the_fly_scoring=True)
+    elif strategy == "duo_attention":
+        return DuoAttentionPressWrapper()
     else:
         raise NotImplementedError(f"Press strategy not implemented: {strategy}")
 
