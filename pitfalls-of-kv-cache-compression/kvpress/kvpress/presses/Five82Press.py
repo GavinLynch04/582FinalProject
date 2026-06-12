@@ -93,8 +93,6 @@ class Five82Press(DuoAttentionPress):
 
 
     def __post_init_from_model__(self, model):
-        # Run DuoAttention's setup 
+        self.compression_ratio = self.head_compression_ratio
         super().__post_init_from_model__(model)
-
-        # Replace streaming mask
         self.streaming_mask = self._make_pyramid_streaming_mask(model).to(model.device)

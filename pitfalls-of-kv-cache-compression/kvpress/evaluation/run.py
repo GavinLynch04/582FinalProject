@@ -10,7 +10,7 @@ import pandas as pd
 # 1. Configuration
 # ==========================================
 # Add your custom press name to this list once it's in evaluate_registry.py
-PRESSES = ["five", "pyramidkv", "duo_attention"]
+PRESSES = ["Pharoah"]
 COMPRESSION_RATIOS = [0.1, 0.3, 0.5, 0.7, 0.9]
 
 DATASET = "ruler"
