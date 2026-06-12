@@ -15,7 +15,10 @@ $env:SSL_CERT_FILE = (& $PYTHON -c "import certifi; print(certifi.where())")
 $env:REQUESTS_CA_BUNDLE = $env:SSL_CERT_FILE
 $env:CURL_CA_BUNDLE = $env:SSL_CERT_FILE
 
-# Install local kvpress (includes Five82Press) over the system-installed version
+# Make the repo root importable so Five82Press.py can be found at the top level
+$env:PYTHONPATH = "C:\Users\becks\repos\582FinalProject;$env:PYTHONPATH"
+
+# Install local kvpress over the system-installed version
 & $PYTHON -m pip install -e "$REPO\kvpress" --quiet
 
 # Run the experiment
@@ -26,10 +29,10 @@ try {
         --model_name_shorthand "llama_3.2_1b_instruct" `
         --model_cache_dir "$env:USERPROFILE\.cache\huggingface\hub" `
         --press_name five82 `
-        --num_prompts 10 `
+        --num_prompts 80 `
         --compression_ratio_start 0.0 `
         --compression_ratio_end 0.9 `
-        --compression_ratio_steps 6 `
+        --compression_ratio_steps 10 `
         --analyze_kept_tokens False `
         --max_new_tokens 256
 } finally {
